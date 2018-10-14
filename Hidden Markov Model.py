@@ -5,16 +5,16 @@ import random
 
 class state(Alphabet.Alphabet):
     letters = ['1', '2', '3']
-class observation(Alphabet.Alphabet):
+class DNA(Alphabet.Alphabet):
     letters = ['A','C','G','T']
 
-mm = MarkovModel.MarkovModelBuilder(state(), observation())
-mm.allow_all_transitions()
+model = MarkovModel.MarkovModelBuilder(state(), DNA())
+model.allow_all_transitions()
 
 #set probailitas awal secara random
-mm.set_random_probabilities()
+model.set_random_probabilities()
 
-baum_welch = mm.get_markov_model()
+baum_welch = model.get_markov_model()
 
 VERBOSE = 0
 def stop_training(log_likelihood_change, n_iterasi):
@@ -34,19 +34,19 @@ for i in range(num):
     states.append(random.choice('123'))
 states.toseq()
 
-alphabet = MutableSeq('',observation())
+sequence = MutableSeq('',DNA())
 for i in range(num):
-    alphabet.append(random.choice('ACTG'))
-alphabet.toseq()
+    sequence.append(random.choice('ACTG'))
+sequence.toseq()
 
 
-seq = Trainer.TrainingSequence(alphabet,states)
+seq = Trainer.TrainingSequence(sequence,states)
 trainer = Trainer.BaumWelchTrainer(baum_welch)
 trained = trainer.train([seq], stop_training)
 
 print('\n\nProbabilitas Transisi: ',trained.transition_prob)
 print('\nProbabilitas Emisi: ',trained.emission_prob)
 
-prediction, prob = trained.viterbi(alphabet, state())
+prediction, prob = trained.viterbi(sequence, state())
 print('\nProbabilitas Prediksi: ', prob)
-Utilities.pretty_print_prediction(alphabet, states, prediction)
+Utilities.pretty_print_prediction(sequence, states, prediction)
