@@ -1,3 +1,4 @@
+#%%
 from Bio.HMM import MarkovModel, Trainer, Utilities
 from Bio.Seq import MutableSeq, Seq
 from Bio import Alphabet
@@ -28,25 +29,36 @@ def stop_training(log_likelihood_change, n_iterasi):
         return 0
 
 
-num = 200
-states = MutableSeq('',state())
-for i in range(num):
-    states.append(random.choice('123'))
-states.toseq()
+def random_generator(num):
+    states = MutableSeq('',state())
+    for i in range(num):
+        states.append(random.choice('123'))
+    
 
-sequence = MutableSeq('',DNA())
-for i in range(num):
-    sequence.append(random.choice('ACTG'))
-sequence.toseq()
+    sequence = MutableSeq('',DNA())
+    for i in range(num):
+        sequence.append(random.choice('ACTG'))
+    
+    return states.toseq(),sequence.toseq()
 
+n_seq = 30
+states = []
+sequence = []
+seq = []
 
-seq = Trainer.TrainingSequence(sequence,states)
+for i in range(n_seq):
+    num = 10
+    state2, sequence2 = random_generator(num)
+    states.append(state2)
+    sequence.append(sequence2)
+    seq.append(Trainer.TrainingSequence(sequence[i],states[i]))
+    
 trainer = Trainer.BaumWelchTrainer(baum_welch)
-trained = trainer.train([seq], stop_training)
+trained = trainer.train(seq, stop_training)
 
 print('\n\nProbabilitas Transisi: ',trained.transition_prob)
 print('\nProbabilitas Emisi: ',trained.emission_prob)
 
-prediction, prob = trained.viterbi(sequence, state())
+prediction, prob = trained.viterbi(sequence[0], state())
 print('\nProbabilitas Prediksi: ', prob)
-Utilities.pretty_print_prediction(sequence, states, prediction)
+Utilities.pretty_print_prediction(sequence[0], states[0], prediction)
